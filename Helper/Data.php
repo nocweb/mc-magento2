@@ -452,11 +452,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     break;
                 case 'billing_telephone':
                     try {
-                        $address = $this->_addressRepositoryInterface->getById($customer->getDefaultBilling());
-                        if ($address) {
-                            $telephone = $address->getTelephone();
-                            if ($telephone) {
-                                $merge_vars[$key] = $telephone;
+                        $addressId = $customer->getDefaultBilling();
+                        if($addressId) {
+                            $address = $this->_addressRepositoryInterface->getById($addressId);
+                            if ($address) {
+                                $telephone = $address->getTelephone();
+                                if ($telephone) {
+                                    $merge_vars[$key] = $telephone;
+                                }
                             }
                         }
                     } catch(\Exception $e) {
@@ -465,11 +468,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     break;
                 case 'billing_company':
                     try {
-                        $address = $this->_addressRepositoryInterface->getById($customer->getDefaultBilling());
-                        if ($address) {
-                            $company = $address->getCompany();
-                            if ($company) {
-                                $merge_vars[$key] = $company;
+                      $addressId = $customer->getDefaultBilling();
+                        if($addressId) {
+                            $address = $this->_addressRepositoryInterface->getById($addressId);
+                            if ($address) {
+                                $company = $address->getCompany();
+                                if ($company) {
+                                    $merge_vars[$key] = $company;
+                                }
                             }
                         }
                     } catch(\Exception $e) {
@@ -479,11 +485,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     break;
                 case 'shipping_telephone':
                     try {
-                        $address = $this->_addressRepositoryInterface->getById($customer->getDefaultShipping());
-                        if ($address) {
-                            $telephone = $address->getTelephone();
-                            if ($telephone) {
-                                $merge_vars[$key] = $telephone;
+                        $addressId = $customer->getDefaultShipping();
+                        if($addressId) {
+                            $address = $this->_addressRepositoryInterface->getById($addressId);
+                            if ($address) {
+                                $telephone = $address->getTelephone();
+                                if ($telephone) {
+                                    $merge_vars[$key] = $telephone;
+                                }
                             }
                         }
                     } catch(\Exception $e) {
@@ -492,11 +501,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     break;
                 case 'shipping_company':
                     try {
-                        $address = $this->_addressRepositoryInterface->getById($customer->getDefaultShipping());
-                        if ($address) {
-                            $company = $address->getCompany();
-                            if ($company) {
-                                $merge_vars[$key] = $company;
+                        $addressId = $customer->getDefaultShipping();
+                        if($addressId) {
+                            $address = $this->_addressRepositoryInterface->getById($addressId);
+                            if ($address) {
+                                $company = $address->getCompany();
+                                if ($company) {
+                                    $merge_vars[$key] = $company;
+                                }
                             }
                         }
                     } catch(\Exception $e) {
@@ -571,18 +583,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected function _updateMergeVars($key, $type, $customer)
     {
         $merge_vars = [];
-        try {
-            $address = $this->_addressRepositoryInterface->getById($customer->{'getDefault' . $type});
-            if ($address) {
-                $merge_vars[$key] = [
-                    'addr1' => $address->getStreetLine(1),
-                    'addr2' => $address->getStreetLine(2),
-                    'city' => $address->getCity(),
-                    'state' => (!$address->getRegion() ? $address->getCity() : $address->getRegion()),
-                    'zip' => $address->getPostcode(),
-                    'country' => $address->getCountryId()
-                ];
 
+        try {
+            $addressId = $customer->{'getDefault' . $type}();
+            if($addressId) { 
+                $address = $this->_addressRepositoryInterface->getById($addressId);
+                if ($address) {
+                    $merge_vars[$key] = [
+                        'addr1' => implode(', ',$address->getStreet(1)),
+                        'addr2' => '',
+                        'city' => $address->getCity(),
+                        'state' => (!$address->getRegion() ? $address->getCity() : $address->getRegion()),
+                        'zip' => $address->getPostcode(),
+                        'country' => $address->getCountryId()
+                    ];
+                }
             }
         } catch(\Exception $e) {
             $this->log($e->getMessage());
